@@ -33,7 +33,7 @@ manyRepeated :: String -> Bool
 manyRepeated id = any (\x -> x) repeats
   where
   len = length id
-  repeats = [ (len `mod` c == 0) && repeated (take c id) (drop c id) | c <- [1..(len `div` 2)] ]
+  repeats = [ repeated (take c id) (drop c id) | c <- [1..(len `div` 2)], len `mod` c == 0 ]
   
 
 solve1 :: [(Int, Int)] -> Int
