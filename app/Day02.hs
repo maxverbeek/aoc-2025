@@ -27,10 +27,10 @@ twiceRepeated id = even len && first == second
   first = take halflen id
   second = drop halflen id
 
-repeated needle haystack = all id $ zipWith (==) haystack (cycle needle)
+repeated needle haystack = and $ zipWith (==) haystack (cycle needle)
 
 manyRepeated :: String -> Bool
-manyRepeated id = any (\x -> x) repeats
+manyRepeated id = or repeats
   where
   len = length id
   repeats = [ repeated (take c id) (drop c id) | c <- [1..(len `div` 2)], len `mod` c == 0 ]
