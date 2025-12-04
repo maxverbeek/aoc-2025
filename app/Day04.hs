@@ -17,7 +17,7 @@ type Location = (Int, Int)
 (.+) (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
 
 locations :: [String] -> S.Set Location
-locations lines = foldr S.insert (S.empty) [ (x, y) | (y, line) <- zip [0.. ] lines, (x, c) <- zip [0..] line, c == '@' ]
+locations lines = S.fromList [ (x, y) | (y, line) <- zip [0.. ] lines, (x, c) <- zip [0..] line, c == '@' ]
 
 directions :: [Location]
 directions = [(x, y) | x <- [-1, 0, 1], y <- [-1, 0, 1], (x, y) /= (0,0)]
