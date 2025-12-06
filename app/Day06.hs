@@ -1,30 +1,20 @@
-import qualified Aoc
-import Data.List.Split (wordsBy)
 import Data.List (transpose)
+import Data.List.Split (splitWhen)
 
 main :: IO ()
 main = do
-  rlines <- reverse <$> Aoc.readLines
-  let wordlines = transpose $ map (wordsBy (== ' ')) rlines
-  print $ sum $ map solve1 wordlines
-  print $ solve2 rlines
+  maths <- splitWhen (all (== ' ')) <$> transpose <$> lines <$> getContents
+  print $ sum $ map solve1 maths
+  print $ sum $ map solve2 maths
 
-combine "*" = foldr (*) 1
-combine "+" = foldr (+) 0
-
-dropOnlyWhitespace :: [String] -> [String]
-dropOnlyWhitespace = filter (not . all (== ' '))
-
-solve1 (op:nums) = combine op (map read nums)
-
-solve2 ("":_) = 0
-solve2 (opline : numlines) = solve1 ((nowhitespace opcol) : transposed) + solve2 (restopcol : restnumlines)
+solve1 :: [String] -> Integer
+solve1 xs = combine (head (last xs')) (init xs')
   where
-  takecol (x:xs) = x : takeWhile (== ' ') xs
-  opcol = takecol opline
-  numcol = map (take (length opcol)) numlines
-  restopcol = drop (length opcol) opline
-  restnumlines = map (drop (length opcol)) numlines
-  transposed = dropOnlyWhitespace $ map reverse $ transpose numcol
+  xs' = transpose xs
 
-nowhitespace cs = [c | c <- cs, c /= ' ']
+solve2 :: [String] -> Integer
+solve2 xs = combine (last $ head xs) (map init xs)
+
+combine :: Char -> [String] -> Integer
+combine '*' = foldr (*) 1 . map read
+combine '+' = foldr (+) 0 . map read
