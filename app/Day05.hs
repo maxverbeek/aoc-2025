@@ -1,11 +1,10 @@
 import qualified Aoc
-import Data.List (sort)
 
 main :: IO ()
 main = do
   content <- Aoc.readLines
   let [rangesstr, numbers] = Aoc.splitOn "" content
-  let ranges = map parseRange rangesstr
+  let ranges = flattenRanges $ map parseRange rangesstr
   let ingredients = map read numbers
   print $ solve1 ranges ingredients
   print $ solve2 ranges
@@ -21,23 +20,14 @@ rangeFromList [a, b] = (a, b)
 includes :: Range -> Integer -> Bool
 includes (from, to) elem = elem >= from && elem <= to
 
-data Merged = Separate | Expanded Range
+subtractRange :: Range -> Range -> [Range]
+subtractRange (a, b) (c, d) =
+  [ (a, c - 1) | (a, b) `includes` c ] ++
+  [ (d + 1, b) | (a, b) `includes` d ] ++
+  [ (a, b) | d < a || c > b ]
 
-mergeoverlap :: Range -> Range -> Merged
-mergeoverlap (a, b) (c, d)
-  | c < a = mergeoverlap (c, d) (a, b)
-  | b < c = Separate
-  | otherwise = Expanded (a, max b d)
-
-flattenRanges :: [Range] -> [Range]
-flattenRanges [] = []
-flattenRanges ranges = go (sort ranges)
-  where
-    go [] = []
-    go [r] = [r]
-    go (r1:r2:rs) = case mergeoverlap r1 r2 of
-      Separate -> r1 : go (r2:rs)
-      Expanded merged -> go (merged:rs)
+flattenRanges = foldr add []
+  where add range rest = range : concatMap (`subtractRange` range) rest
 
 width :: (Integer, Integer) -> Integer
 width (a, b) = (b + 1) - a
@@ -46,4 +36,4 @@ solve1 :: [Range] -> [Integer] -> Int
 solve1 ranges ingredients = length $ filter (\i -> any (`includes` i) ranges) ingredients
 
 solve2 :: [Range] -> Integer
-solve2 ranges  = sum $ map width $ flattenRanges ranges
+solve2 ranges  = sum $ map width ranges
