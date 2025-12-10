@@ -25,6 +25,7 @@
               ghc
               cabal-install
               haskell-language-server
+              z3
             ];
           };
         }

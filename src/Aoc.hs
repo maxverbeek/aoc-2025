@@ -1,6 +1,10 @@
 module Aoc where
 
 import Data.Char (digitToInt)
+import Data.Sequence (Seq (..), (|>))
+import qualified Data.Sequence as Seq
+import Data.Set (Set)
+import qualified Data.Set as Set
 
 data LetterDirection = L | R deriving (Show)
 
@@ -42,3 +46,19 @@ droplast n = reverse . drop n . reverse
 
 toDigits :: String -> [Int]
 toDigits = map digitToInt
+
+-- a represents a state
+-- given an initial state, and a neighbour function, and a goal predicate, give me the shortest path of all states to my goal.
+bfs :: (Ord a) => a -> (a -> [a]) -> (a -> Bool) -> Maybe [a]
+bfs start neighbours isGoal = go (Seq.singleton [start]) (Set.singleton start)
+  where
+    go Empty _ = Nothing
+    go (path :<| queue) visited
+      | isGoal current = Just $ reverse path
+      | otherwise = go queue' visited'
+      where
+        current = head path
+        nexts = filter (`Set.notMember` visited) (neighbours current)
+        newPaths = map (: path) nexts
+        queue' = foldl (|>) queue newPaths
+        visited' = foldl (flip Set.insert) visited nexts
