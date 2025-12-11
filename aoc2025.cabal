@@ -59,7 +59,7 @@ common warnings
 
 common day-exe
     import:           warnings
-    build-depends:    base ^>=4.20.2.0, containers, aoc2025, split, extra, sbv
+    build-depends:    base ^>=4.20.2.0, containers, aoc2025, split, extra, sbv, MemoTrie
     hs-source-dirs:   app
     default-language: Haskell2010
 
